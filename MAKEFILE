@@ -1,27 +1,27 @@
-chrome_theme.crx: key.pem FORCE
+not-just-black.crx: key.pem FORCE
 	@echo -e "\nCreating theme...\n"
-	./crxmake chrome_theme key.pem
+	./crxmake not-just-black key.pem
 
 key.pem:
 	@echo -e "\nCreating key to be used by the theme...\n"
-	openssl genrsa -out rsa.pem 2048  # Increased key size
+	openssl genrsa -out rsa.pem 2048
 	openssl pkcs8 -topk8 -nocrypt -in rsa.pem -out key.pem
 	rm rsa.pem
 
-# Updated install target for developer mode
 install-dev:
 	@echo -e "\nTo install:"
 	@echo "1. Go to chrome://extensions/"
 	@echo "2. Enable Developer Mode"
 	@echo "3. Click 'Load unpacked'"
-	@echo "4. Select: $(CURDIR)/chrome_theme"
+	@echo "4. Select: $(CURDIR)/not-just-black"
 
+# Windows-compatible zip target using PowerShell
 zip:
-	zip chrome_theme.zip \
-		chrome_theme/images \
-		chrome_theme/manifest.json
+	powershell -Command "if (Test-Path not-just-black.zip) { Remove-Item not-just-black.zip }; Compress-Archive -Path not-just-black -DestinationPath not-just-black.zip"
+	@echo "Created not-just-black.zip"
 
 clean:
-	-rm -f *.crx *.pem *.zip
+	-rm -f *.crx *.pem
+	-powershell -Command "if (Test-Path not-just-black.zip) { Remove-Item not-just-black.zip }"
 
 FORCE:
