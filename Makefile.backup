@@ -1,0 +1,27 @@
+chrome_theme.crx: key.pem FORCE
+	@echo -e "\nCreating theme...\n"
+	./crxmake chrome_theme key.pem
+
+key.pem:
+	@echo -e "\nCreating key to be used by the theme...\n"
+	openssl genrsa -out rsa.pem 2048  # Increased key size
+	openssl pkcs8 -topk8 -nocrypt -in rsa.pem -out key.pem
+	rm rsa.pem
+
+# Updated install target for developer mode
+install-dev:
+	@echo -e "\nTo install:"
+	@echo "1. Go to chrome://extensions/"
+	@echo "2. Enable Developer Mode"
+	@echo "3. Click 'Load unpacked'"
+	@echo "4. Select: $(CURDIR)/chrome_theme"
+
+zip:
+	zip chrome_theme.zip \
+		chrome_theme/images \
+		chrome_theme/manifest.json
+
+clean:
+	-rm -f *.crx *.pem *.zip
+
+FORCE:
