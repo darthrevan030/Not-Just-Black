@@ -1,4 +1,25 @@
-## Customization
+# Not Just Black - Chrome Theme
+
+# Description
+
+A sleek, minimalist dark theme for Chrome featuring pure black backgrounds and crisp white text. "Not Just Black" provides maximum contrast for comfortable browsing while maintaining a clean, professional appearance.
+
+# Features
+- **Pure black window frames and backgrounds** for a truly dark experience
+- **High-contrast white text** for excellent readability
+- **Custom New Tab Page background** with centered image
+- **Optimized for both regular and incognito modes**
+- **Clean, distraction-free design** that's easy on the eyes
+
+# Preview
+The theme includes:
+- Black browser frame and toolbar backgrounds
+- Dark gray (#222222) toolbar for subtle contrast
+- White text on all tabs (active, inactive, and incognito)
+- Black New Tab Page with custom background image
+- White address bar text on dark background
+
+# Customization
 
 To modify the theme:
 
@@ -9,31 +30,12 @@ To modify the theme:
 4. **Properties**: Adjust `properties` in manifest for background positioning
 
 **Git Bash (Windows) / Terminal (Mac/Linux):**
-```bash
+```
 # After making changes, rebuild
 make package
-```# Not Just Black - Chrome Theme
+```
 
-A sleek, minimalist dark theme for Chrome featuring pure black backgrounds and crisp white text. "Not Just Black" provides maximum contrast for comfortable browsing while maintaining a clean, professional appearance.
-
-## Features
-
-- **Pure black window frames and backgrounds** for a truly dark experience
-- **High-contrast white text** for excellent readability
-- **Custom New Tab Page background** with centered image
-- **Optimized for both regular and incognito modes**
-- **Clean, distraction-free design** that's easy on the eyes
-
-## Preview
-
-The theme includes:
-- Black browser frame and toolbar backgrounds
-- Dark gray (#222222) toolbar for subtle contrast
-- White text on all tabs (active, inactive, and incognito)
-- Black New Tab Page with custom background image
-- White address bar text on dark background
-
-## Installation
+# Installation
 
 ### From Chrome Web Store (Recommended)
 1. Visit the Chrome Web Store (link coming soon)
@@ -42,7 +44,7 @@ The theme includes:
 
 ### Developer Installation (For Testing)
 **Git Bash (Windows) / Terminal (Mac/Linux):**
-```bash
+```
 # Navigate to project directory
 cd /path/to/customChromeTheme
 
@@ -60,7 +62,7 @@ make verify
 
 ### Built Package Installation
 **Git Bash (Windows) / Terminal (Mac/Linux):**
-```bash
+```
 # Build the CRX file
 make package
 ```
@@ -106,7 +108,7 @@ built/
 ### Build Commands
 
 **Git Bash (Windows) / Terminal (Mac/Linux):**
-```bash
+```
 # Create ZIP package for Chrome Web Store (output: built/)
 make zip
 
@@ -187,7 +189,7 @@ Located in `img-dump/` directory:
 - **New Tab background**: `not-just-black/img/theme_ntp_background.png`
 
 #### Color Reference
-```json
+```
 {
   "frame": [0, 0, 0],              // Window border - pure black
   "toolbar": [34, 34, 34],         // Main toolbar - dark gray
@@ -220,7 +222,7 @@ Located in `img-dump/` directory:
 1. Update the version number in `not-just-black/manifest.json`
 
 **Git Bash (Windows) / Terminal (Mac/Linux):**
-```bash
+```
 # Create fresh builds
 make package
 ```
