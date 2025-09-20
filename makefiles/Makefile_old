@@ -1,0 +1,27 @@
+not-just-black.crx: key.pem FORCE
+	@echo -e "\nCreating theme...\n"
+	bash ./crxmake.sh not-just-black key.pem
+
+key.pem:
+	@echo -e "\nCreating key to be used by the theme...\n"
+	openssl genrsa -out rsa.pem 2048
+	openssl pkcs8 -topk8 -nocrypt -in rsa.pem -out key.pem
+	rm rsa.pem
+
+install-dev:
+	@echo -e "\nTo install:"
+	@echo "1. Go to chrome://extensions/"
+	@echo "2. Enable Developer Mode"
+	@echo "3. Click 'Load unpacked'"
+	@echo "4. Select: $(CURDIR)/not-just-black"
+
+# Windows-compatible zip target using PowerShell - compress contents, not folder
+zip:
+	powershell -Command "if (Test-Path not-just-black.zip) { Remove-Item not-just-black.zip }; Set-Location not-just-black; Compress-Archive -Path * -DestinationPath ../not-just-black.zip; Set-Location .."
+	@echo "Created not-just-black.zip"
+
+clean:
+	-rm -f *.crx *.pem
+# 	-powershell -Command "if (Test-Path not-just-black.zip) { Remove-Item not-just-black.zip }"
+
+FORCE:

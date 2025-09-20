@@ -1,27 +1,134 @@
-not-just-black.crx: key.pem FORCE
-	@echo -e "\nCreating theme...\n"
-	bash ./crxmake.sh not-just-black key.pem
+# Chrome Extension/Theme Build System
+# Generic Makefile for Chrome extensions and themes
 
-key.pem:
-	@echo -e "\nCreating key to be used by the theme...\n"
-	openssl genrsa -out rsa.pem 2048
-	openssl pkcs8 -topk8 -nocrypt -in rsa.pem -out key.pem
-	rm rsa.pem
+# Configuration - Change these for different projects
+EXTENSION_NAME = not-just-black
+EXTENSION_DIR = $(EXTENSION_NAME)
+BUILD_DIR = built
+KEY_SIZE = 2048
 
+# Derived variables
+CRX_FILE = $(BUILD_DIR)/$(EXTENSION_NAME).crx
+ZIP_FILE = $(BUILD_DIR)/$(EXTENSION_NAME).zip
+KEY_FILE = key.pem
+TEMP_KEY = rsa.pem
+
+# Build targets
+.PHONY: all build zip clean install-dev help verify package new-key FORCE
+
+# Default target
+all: build
+
+# Build the CRX extension
+build: $(CRX_FILE)
+
+$(CRX_FILE): $(KEY_FILE) FORCE
+	@echo "Creating extension: $(EXTENSION_NAME)"
+	@mkdir -p $(BUILD_DIR)
+	bash ./crxmake.sh $(EXTENSION_DIR) $(KEY_FILE)
+	@mv $(EXTENSION_NAME).crx $(BUILD_DIR)/
+
+# Generate signing key
+$(KEY_FILE):
+	@echo "Generating $(KEY_SIZE)-bit RSA key..."
+	openssl genrsa -out $(TEMP_KEY) $(KEY_SIZE)
+	openssl pkcs8 -topk8 -nocrypt -in $(TEMP_KEY) -out $(KEY_FILE)
+	rm -f $(TEMP_KEY)
+
+# Create ZIP package for Chrome Web Store
+zip: $(ZIP_FILE)
+
+$(ZIP_FILE): FORCE
+	@echo "Creating ZIP package: $(ZIP_FILE)"
+	@if [ ! -d "$(EXTENSION_DIR)" ]; then \
+		echo "Error: Extension directory '$(EXTENSION_DIR)' not found!"; \
+		exit 1; \
+	fi
+	@mkdir -p $(BUILD_DIR)
+	@rm -f $(ZIP_FILE)
+	@cd $(EXTENSION_DIR) && powershell.exe -Command \
+		"Compress-Archive -Path * -DestinationPath '../$(ZIP_FILE)' -CompressionLevel Optimal -Force"
+	@echo "Created $(ZIP_FILE) - ready for Chrome Web Store upload"
+
+# Show developer installation instructions
 install-dev:
-	@echo -e "\nTo install:"
-	@echo "1. Go to chrome://extensions/"
-	@echo "2. Enable Developer Mode"
+	@echo ""
+	@echo "=== Developer Installation Instructions ==="
+	@echo "1. Open Chrome and go to: chrome://extensions/"
+	@echo "2. Enable 'Developer mode' (toggle in top right)"
 	@echo "3. Click 'Load unpacked'"
-	@echo "4. Select: $(CURDIR)/not-just-black"
+	@echo "4. Select this directory: $(CURDIR)/$(EXTENSION_DIR)"
+	@echo "5. Your extension will be loaded and activated"
+	@echo ""
 
-# Windows-compatible zip target using PowerShell - compress contents, not folder
-zip:
-	powershell -Command "if (Test-Path not-just-black.zip) { Remove-Item not-just-black.zip }; Set-Location not-just-black; Compress-Archive -Path * -DestinationPath ../not-just-black.zip; Set-Location .."
-	@echo "Created not-just-black.zip"
-
+# Clean up generated files
 clean:
-	-rm -f *.crx *.pem
-# 	-powershell -Command "if (Test-Path not-just-black.zip) { Remove-Item not-just-black.zip }"
+	@echo "Cleaning up generated files..."
+	-rm -f *.crx *.pem *.zip
+	-rm -rf $(BUILD_DIR)
+	@echo "Clean complete"
 
+# Verify extension structure
+verify:
+	@echo "Verifying extension structure..."
+	@if [ ! -d "$(EXTENSION_DIR)" ]; then \
+		echo "❌ Extension directory '$(EXTENSION_DIR)' not found!"; \
+		exit 1; \
+	fi
+	@if [ ! -f "$(EXTENSION_DIR)/manifest.json" ]; then \
+		echo "❌ manifest.json not found in $(EXTENSION_DIR)/"; \
+		exit 1; \
+	fi
+	@echo "✅ Extension directory: $(EXTENSION_DIR)/"
+	@echo "✅ Manifest file: $(EXTENSION_DIR)/manifest.json"
+	@if [ -f "$(KEY_FILE)" ]; then \
+		echo "✅ Signing key: $(KEY_FILE)"; \
+	else \
+		echo "⚠️  Signing key not found (will be generated)"; \
+	fi
+	@echo "Structure verification complete"
+
+# Generate new key (force regeneration)
+new-key:
+	@echo "Generating new signing key..."
+	rm -f $(KEY_FILE) $(TEMP_KEY)
+	$(MAKE) $(KEY_FILE)
+
+# Package for different distribution methods
+package: zip build
+	@echo ""
+	@echo "=== Packaging Complete ==="
+	@echo "Chrome Web Store: $(ZIP_FILE)"
+	@echo "Direct install:   $(CRX_FILE)"
+	@echo "Build directory:  $(BUILD_DIR)/"
+	@echo ""
+
+# Show help
+help:
+	@echo ""
+	@echo "=== Chrome Extension Build System ==="
+	@echo ""
+	@echo "Configuration:"
+	@echo "  EXTENSION_NAME = $(EXTENSION_NAME)"
+	@echo "  EXTENSION_DIR  = $(EXTENSION_DIR)"
+	@echo "  BUILD_DIR      = $(BUILD_DIR)"
+	@echo "  KEY_SIZE       = $(KEY_SIZE)"
+	@echo ""
+	@echo "Available targets:"
+	@echo "  build       - Build CRX file (default)"
+	@echo "  zip         - Create ZIP for Chrome Web Store"
+	@echo "  package     - Create both ZIP and CRX files"
+	@echo "  clean       - Remove generated files"
+	@echo "  verify      - Check extension structure"
+	@echo "  install-dev - Show developer installation guide"
+	@echo "  new-key     - Generate new signing key"
+	@echo "  help        - Show this help message"
+	@echo ""
+	@echo "Quick start:"
+	@echo "  make zip           # For Chrome Web Store"
+	@echo "  make package       # For all distribution methods"
+	@echo "  make install-dev   # For local testing"
+	@echo ""
+
+# Force target to always rebuild
 FORCE:
