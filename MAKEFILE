@@ -1,6 +1,6 @@
 not-just-black.crx: key.pem FORCE
 	@echo -e "\nCreating theme...\n"
-	./crxmake not-just-black key.pem
+	bash ./crxmake.sh not-just-black key.pem
 
 key.pem:
 	@echo -e "\nCreating key to be used by the theme...\n"
