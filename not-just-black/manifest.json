@@ -38,7 +38,7 @@
 
         "properties": {
             "ntp_background_alignment": "center bottom",
-            "ntp_background_repeat": "repeat-x"
+            "ntp_background_repeat": "no-repeat"
         }
     }
 }
